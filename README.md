@@ -64,6 +64,8 @@
 
 4.  このURLをクリックすれば、遊べます
     https://imshota1009.github.io/PixelRPGRun/
+
+    
 **注意:** ゲームを正しく表示・動作させるためには、以下のファイルが `index.html` と同じ階層にある必要があります。
 * `game.js`
 * `dino_player.png` （プレイヤー画像）
