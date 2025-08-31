@@ -1,11 +1,11 @@
-# Dino RPG Runner 🦖✨
+# RPG Runner ✨
 
 <div align="center">
   <img src="https/placehold.co/600x300?text=Gameplay+Screenshot" alt="ゲームプレイのスクリーンショット">
 </div>
 
 <p align="center">
-  <strong>Chromeの恐竜ゲームにRPG要素を加えた、シンプルなJavaScript製エンドレスランナーゲーム！</strong>
+  <strong>Chromeのあの恐竜ゲームにRPG要素を加えた、シンプルなJavaScript製エンドレスランナーゲーム！</strong>
 </p>
 
 <p align="center">
@@ -17,7 +17,7 @@
 
 ## 🎮 ゲームの概要 (About The Game)
 
-`Dino RPG Runner`は、おなじみの恐竜ランゲームをベースに、コイン収集や自動戦闘、商人との取引といったRPG要素を取り入れたオリジナルゲームです。障害物をジャンプで避けながら、どこまでスコアを伸ばせるかに挑戦します。
+`RPG Runner`は、おなじみの恐竜ランゲームをベースに、コイン収集や自動戦闘、商人との取引といったRPG要素を取り入れたオリジナルゲームです。障害物をジャンプで避けながら、どこまでスコアを伸ばせるかに挑戦します。
 
 一定のスコアに到達すると、個性的な商人たちがランダムで登場し、集めたコインを使って冒険を有利に進めるアイテムを購入できます。
 
@@ -58,7 +58,7 @@
     ```
 2.  クローンしたディレクトリに移動します。
     ```sh
-    cd dino-rpg-runner
+    cd rpg-runner
     ```
 3.  `index.html` ファイルをブラウザで開きます。
 
