@@ -54,7 +54,7 @@
 
 1.  このリポジトリをクローンします。
     ```sh
-    git clone [https://github.com/YOUR_USERNAME/dino-rpg-runner.git](https://github.com/YOUR_USERNAME/dino-rpg-runner.git)
+    git clone [https://github.com/imshota1009/PixelRPGRun.git](https://github.com/imshota1009/PixelRPGRun.git)
     ```
 2.  クローンしたディレクトリに移動します。
     ```sh
