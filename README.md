@@ -1,4 +1,4 @@
-# PixelRPG Runner ✨
+# Pixel RPG Runner ✨
 
 <div align="center">
 
