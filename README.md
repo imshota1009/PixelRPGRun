@@ -68,11 +68,3 @@
 * `merchant1.png` （商人1の画像）
 * `merchant2.png` （商人2の画像）
 * `background_music.mp3` （BGMファイル）
-
-## 🤝 作者 (Author)
-
-* **[ここにあなたの名前またはGitHubユーザー名]** - [https://github.com/YOUR_USERNAME](https://github.com/YOUR_USERNAME)
-
-## 📜 ライセンス (License)
-
-このプロジェクトは [MITライセンス](https://opensource.org/licenses/MIT) の下で公開されています。
