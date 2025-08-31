@@ -62,7 +62,7 @@
     ```
 3.  `index.html` ファイルをブラウザで開きます。
 
-4.  このURLをクリックすれば、遊べます
+4.  このURLをクリックすれば、遊べます⇒
     https://imshota1009.github.io/PixelRPGRun/
 
     
