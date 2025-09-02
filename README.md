@@ -19,6 +19,8 @@
 
 `Dino RPG Runner`は、おなじみの恐竜ランゲームをベースに、コイン収集や自動戦闘、商人との取引といったRPG要素を取り入れたオリジナルゲームです。障害物をジャンプで避けながら、どこまでスコアを伸ばせるかに挑戦します。
 
+ここから遊べます⇒https://imshota1009.github.io/PixelRPGRun/
+
 一定のスコアに到達すると、個性的な商人たちがランダムで登場し、集めたコインを使って冒険を有利に進めるアイテムを購入できます。
 
 ## ✨ 主な機能 (Features)
@@ -69,9 +71,6 @@
 * `merchant2.png` （商人2の画像）
 * `background_music.mp3` （BGMファイル）
 
-## 🤝 作者 (Author)
-
-* **[ここにあなたの名前またはGitHubユーザー名]** - [https://github.com/YOUR_USERNAME](https://github.com/YOUR_USERNAME)
 
 ## 📜 ライセンス (License)
 
