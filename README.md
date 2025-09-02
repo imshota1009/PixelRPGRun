@@ -1,7 +1,7 @@
 # Dino RPG Runner 🦖✨
 
 <div align="center">
-  <img src="https/placehold.co/600x300?text=Gameplay+Screenshot" alt="ゲームプレイのスクリーンショット">
+ 　(./images/PixelRPG_screenshot.png)
 </div>
 
 <p align="center">
