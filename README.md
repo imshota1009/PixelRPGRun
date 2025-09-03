@@ -1,7 +1,7 @@
 # Dino RPG Runner 🦖✨
 
 <div align="center">
- 　(./images/PixelRPG_screenshot.png)
+
 </div>
 
 <p align="center">
