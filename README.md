@@ -5,7 +5,7 @@
 </div>
 
 <p align="center">
-  <strong>Chromeの恐竜ゲームにRPG要素を加えた、シンプルなJavaScript製エンドレスランナーゲーム！</strong>
+  <strong>A simple JavaScript endless runner game inspired by Chrome’s dino game, enhanced with RPG elements!</strong>
 </p>
 
 <p align="center">
@@ -15,64 +15,79 @@
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
 </p>
 
-## 🎮 ゲームの概要 (About The Game)
+---
 
-`Dino RPG Runner`は、おなじみの恐竜ランゲームをベースに、コイン収集や自動戦闘、商人との取引といったRPG要素を取り入れたオリジナルゲームです。障害物をジャンプで避けながら、どこまでスコアを伸ばせるかに挑戦します。
+## 🎮 About The Game
 
-ここから遊べます⇒https://imshota1009.github.io/PixelRPGRun/
+`Dino RPG Runner` is an original game based on the classic dino runner, but with added RPG elements such as coin collection, auto battles, and merchant trading.  
+Jump over obstacles and see how far you can push your score!
 
-一定のスコアに到達すると、個性的な商人たちがランダムで登場し、集めたコインを使って冒険を有利に進めるアイテムを購入できます。
+👉 Play here: [Dino RPG Runner](https://imshota1009.github.io/PixelRPGRun/)
 
-## ✨ 主な機能 (Features)
+As you reach certain score milestones, unique merchants will appear randomly, allowing you to spend coins on items that help you progress further.
 
-* **簡単な操作**: スペースキー（または画面タップ）でジャンプするだけのシンプル操作。
-* **RPG要素**: 敵との自動戦闘、コイン収集、スコアシステム。
-* **ランダムな商人**: スコアが一定に達すると2種類の商人がランダムで登場。
-* **パワーアップアイテム**: 障害物を1度だけ防ぐ「シールド」や、敵を倒した時のスコアが倍になる「スコアブースト」など。
-* **プログレッシブな難易度**: スコアが上がるにつれて、ゲームのスピードが少しずつ上昇。
-* **BGMとミュート機能**: ゲームを盛り上げるBGMと、ON/OFF切り替え機能。
+---
 
-## 遊び方 (How To Play)
+## ✨ Features
 
-1.  **スタート**: `スタート`ボタンをクリックするか、スペースキーを押してゲームを開始します。
-2.  **ジャンプ**: スペースキーまたは画面をタップして、障害物を飛び越えます。
-3.  **目的**:
-    * 茶色い岩（障害物）を避けてください。当たるとゲームオーバーです。
-    * 黄色いコインを集めてください。
-    * 赤い敵はキャラクターが自動で攻撃して倒します。
-4.  **商人との取引**:
-    * スコアが1000点に到達するごとに商人が現れます。
-    * コインを使ってアイテムを購入し、ゲームを有利に進めましょう。
+* **Simple Controls**: Jump with the space key or screen tap.  
+* **RPG Elements**: Auto battles with enemies, coin collection, and a scoring system.  
+* **Random Merchants**: Two types of merchants appear randomly every 1000 points.  
+* **Power-up Items**:  
+  * **Shield** – Prevents one collision with an obstacle.  
+  * **Score Boost** – Doubles points gained when defeating enemies.  
+* **Progressive Difficulty**: Game speed increases as your score rises.  
+* **BGM & Mute Option**: Background music with toggle support.  
 
-## 🛠️ 使用技術 (Technologies Used)
+---
 
-* **HTML5**: ゲームの基本構造
-* **CSS3 (Tailwind CSS)**: UIとスタイリング
-* **JavaScript (ES6+)**: ゲームのロジック全体
+## 🎮 How To Play
 
-## 🚀 セットアップ方法 (Setup)
+1. **Start**: Click the `Start` button or press the space key to begin.  
+2. **Jump**: Use the space key or tap the screen to leap over obstacles.  
+3. **Objective**:  
+   * Avoid brown rocks (obstacles) — hitting them ends the game.  
+   * Collect yellow coins.  
+   * Defeat red enemies automatically with your character’s attacks.  
+4. **Merchant Trading**:  
+   * Every 1000 points, a merchant will appear.  
+   * Use coins to purchase items and make your run easier.  
 
-このゲームをローカル環境で動かすには、以下の手順に従ってください。
+---
 
-1.  このリポジトリをクローンします。
+## 🛠️ Technologies Used
+
+* **HTML5** – Game structure  
+* **CSS3 (Tailwind CSS)** – UI & styling  
+* **JavaScript (ES6+)** – Core game logic  
+
+---
+
+## 🚀 Setup
+
+To run this game locally, follow these steps:
+
+1. Clone the repository:
     ```sh
-    git clone [https://github.com/YOUR_USERNAME/dino-rpg-runner.git](https://github.com/YOUR_USERNAME/dino-rpg-runner.git)
+    git clone https://github.com/YOUR_USERNAME/dino-rpg-runner.git
     ```
-2.  クローンしたディレクトリに移動します。
+2. Move into the project directory:
     ```sh
     cd dino-rpg-runner
     ```
-3.  `index.html` ファイルをブラウザで開きます。
+3. Open the `index.html` file in your browser.
 
-**注意:** ゲームを正しく表示・動作させるためには、以下のファイルが `index.html` と同じ階層にある必要があります。
-* `game.js`
-* `dino_player.png` （プレイヤー画像）
-* `merchant1.png` （商人1の画像）
-* `merchant2.png` （商人2の画像）
-* `background_music.mp3` （BGMファイル）
+**Note:** Make sure the following files are in the same directory as `index.html` for the game to display and function properly:
+* `game.js`  
+* `dino_player.png` (player sprite)  
+* `merchant1.png` (merchant 1 sprite)  
+* `merchant2.png` (merchant 2 sprite)  
+* `background_music.mp3` (BGM file)  
 
+---
 
-## 📜 ライセンス (License)
+## 📜 License
 
-このプロジェクトは [MITライセンス](https://opensource.org/licenses/MIT) の下で公開されています。
+This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+
 
