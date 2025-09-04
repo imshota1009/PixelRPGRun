@@ -26,6 +26,10 @@ Jump over obstacles and see how far you can push your score!
 
 As you reach certain score milestones, unique merchants will appear randomly, allowing you to spend coins on items that help you progress further.
 
+<div align="center">
+  <img src="images/dino_screenshot.jpg" alt="Push-up Counter Screenshot">
+</div>
+
 ---
 
 ## ✨ Features
