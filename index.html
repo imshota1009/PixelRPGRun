@@ -1,82 +1,74 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ダイナソーRPGアドベンチャー</title>
+    <title>Dino RPG Runner</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'DotGothic16', sans-serif;
-            overflow: hidden;
-            touch-action: none;
+            font-family: 'Press Start 2P', cursive;
+            touch-action: manipulation; /* Disables double-tap to zoom */
         }
         canvas {
-            background: linear-gradient(to bottom, #87CEEB 0%, #f0f8ff 80%);
-            display: block;
-            border-bottom: 4px solid #4CAF50;
+            background-color: #f7f7f7;
+            border: 4px solid #333;
         }
-        .text-shadow {
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        /* Button style */
+        .btn {
+            box-shadow: 4px 4px 0px #333;
+            transition: all 0.1s ease-in-out;
         }
-        .modal-content {
-            background-color: rgba(0, 0, 0, 0.8);
-            border: 2px solid #fff;
-            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+        .btn:active {
+            transform: translate(4px, 4px);
+            box-shadow: none;
+        }
+        /* Notification style */
+        #notification {
+            transition: opacity 0.5s, transform 0.5s;
         }
     </style>
 </head>
-<body class="bg-gray-800 flex items-center justify-center h-screen">
+<body class="bg-gray-200 flex flex-col items-center justify-center min-h-screen p-4">
 
-    <div id="game-container" class="w-full max-w-4xl mx-auto bg-gray-900 rounded-lg shadow-2xl p-4 relative">
-        <!-- UI Display Area -->
-        <div class="absolute top-4 left-4 text-white text-shadow z-10 text-lg md:text-xl flex flex-col space-y-2">
-            <span>スコア: <span id="score">0</span></span>
-            <div class="flex items-center">
-                 <svg class="w-6 h-6 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"></path></svg>
-                <span>コイン: <span id="coins">0</span></span>
+    <div id="game-container" class="w-full max-w-4xl mx-auto bg-white p-4 border-4 border-black rounded-lg shadow-lg">
+        <!-- Header: Score, Coins, Mute Button -->
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex space-x-4">
+                <p id="score" class="text-2xl">Score: 0</p>
+                <p id="coins" class="text-2xl">Coins: 0</p>
             </div>
-            <span id="boost-status" class="text-yellow-300 font-bold hidden">スコアブースト中！</span>
+            <div class="relative">
+                 <span id="boost-timer" class="text-lg font-bold text-yellow-600 mr-4"></span>
+                 <button id="mute-toggle" class="w-10 h-10 bg-gray-300 border-2 border-black rounded-full flex items-center justify-center text-xl">🔊</button>
+            </div>
         </div>
-        
-        <!-- Mute Button -->
-        <button id="mute-toggle" class="absolute top-4 right-4 text-white z-10 p-2 rounded-full bg-black bg-opacity-30 hover:bg-opacity-50">
-            <!-- Speaker Icon will be inserted by JS -->
-        </button>
 
+        <!-- Game Canvas -->
         <canvas id="gameCanvas"></canvas>
 
-        <!-- Start/Game Over Modal -->
-        <div id="modal" class="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center z-20">
-             <div class="modal-content p-8 rounded-lg text-white text-center">
-                <h1 id="modal-title" class="text-4xl md:text-6xl font-bold mb-4 text-shadow">ダイナソーRPG</h1>
-                <p id="modal-text" class="text-xl md:text-2xl mb-8 text-shadow">スペースキー（または画面タップ）でジャンプ！</p>
-                <button id="startButton" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg text-2xl transition duration-300 transform hover:scale-105 shadow-lg">スタート</button>
-            </div>
+        <!-- Start/Restart Screens -->
+        <div id="start-screen" class="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
+            <h1 class="text-5xl text-white mb-8">Dino RPG Runner</h1>
+            <button id="start-button" class="btn bg-green-400 text-black text-3xl font-bold py-4 px-8 border-4 border-black rounded-lg">Start Game</button>
         </div>
-        
-        <!-- Merchant Modal -->
-        <div id="merchant-modal" class="absolute inset-0 bg-black bg-opacity-70 hidden items-center justify-center z-30">
-            <div class="modal-content p-8 rounded-lg text-white text-center flex flex-col items-center max-w-sm">
-                <h1 id="merchant-name" class="text-4xl font-bold mb-2 text-shadow">商人</h1>
-                <!-- Merchant Image Area -->
-                <img id="merchant-image" src="merchant1.png" alt="商人" class="w-24 h-24 md:w-32 md:h-32 object-contain rounded-full border-2 border-yellow-300 mb-4 bg-gray-600">
-                <p id="merchant-dialogue" class="text-xl mb-6">「ようこそ！」</p>
-                <div class="bg-gray-700 p-4 rounded-lg mb-6 w-full">
-                    <h2 id="item-name" class="text-2xl text-yellow-300 mb-2">アイテム</h2>
-                    <p id="item-description" class="mb-4">アイテムの説明</p>
-                    <button id="buyItemButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg text-xl w-full">購入</button>
-                </div>
-                <button id="continueButton" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg text-xl">冒険を続ける</button>
-            </div>
+        <div id="game-over-screen" class="hidden absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
+            <h2 class="text-6xl text-red-500 mb-4">GAME OVER</h2>
+            <p id="final-score" class="text-3xl text-white mb-8"></p>
+            <button id="restart-button" class="btn bg-blue-400 text-black text-3xl font-bold py-4 px-8 border-4 border-black rounded-lg">Restart</button>
         </div>
     </div>
     
+    <!-- Notification Message Area -->
+    <div id="notification" class="absolute top-5 left-1/2 -translate-x-1/2 bg-black text-white text-xl font-bold py-3 px-6 border-4 border-white rounded-lg shadow-lg opacity-0 -translate-y-20">
+        Notification Message
+    </div>
+
     <audio id="bgm" src="background_music.mp3" loop></audio>
-    <script src="game.js" defer></script>
+    <script src="game.js"></script>
 </body>
 </html>
+
+
 
