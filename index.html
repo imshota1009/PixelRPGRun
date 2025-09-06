@@ -79,17 +79,17 @@
     
     <!-- Audio Elements -->
     <audio id="bgm" src="background_music.mp3" loop></audio>
+    <!-- BUG FIX: Corrected the filename from .mpp3 to .mp3 -->
     <audio id="boss-bgm" src="boss_music.mp3" loop></audio>
 
     <!-- Main Game Logic -->
     <script src="game.js"></script>
 
-    <!-- NEW: Inlined Service Worker for PWA Offline Support -->
+    <!-- Inlined Service Worker for PWA Offline Support -->
     <script>
         if ('serviceWorker' in navigator) {
-            // The content of sw.js is now here as a string
             const swContent = `
-                const CACHE_NAME = 'dino-rpg-runner-v2'; // Update version if you change files
+                const CACHE_NAME = 'dino-rpg-runner-v3'; // Cache version updated
                 const urlsToCache = [
                     '/',
                     'index.html',
@@ -97,10 +97,6 @@
                     'background_music.mp3',
                     'boss_music.mp3',
                     'dino_player.png',
-                    // Add your merchant images if you have them
-                    // 'merchant1.png',
-                    // 'merchant2.png',
-                    // Add your PWA icon images
                     'images/icon-192.png',
                     'images/icon-512.png'
                 ];
@@ -121,13 +117,26 @@
                         })
                     );
                 });
+
+                self.addEventListener('activate', event => {
+                    var cacheWhitelist = [CACHE_NAME];
+                    event.waitUntil(
+                        caches.keys().then(cacheNames => {
+                            return Promise.all(
+                                cacheNames.map(cacheName => {
+                                    if (cacheWhitelist.indexOf(cacheName) === -1) {
+                                        return caches.delete(cacheName);
+                                    }
+                                })
+                            );
+                        })
+                    );
+                });
             `;
             
-            // Create a "virtual" file from the string
             const blob = new Blob([swContent], { type: 'application/javascript' });
             const swUrl = URL.createObjectURL(blob);
 
-            // Register the virtual file as the service worker
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register(swUrl).then(registration => {
                     console.log('Inlined ServiceWorker registration successful!');
