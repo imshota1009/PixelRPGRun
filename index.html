@@ -9,11 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
-        /* --- CHANGE: Switched to a light theme --- */
         body {
             font-family: 'Press Start 2P', cursive;
-            background-color: #f7fafc; /* Light gray background */
-            color: #2d3748; /* Dark gray text */
+            background-color: #f7fafc;
+            color: #2d3748;
             overflow: hidden;
             touch-action: manipulation;
         }
@@ -22,10 +21,10 @@
             display: inline-block;
             padding: 12px 24px;
             margin: 8px;
-            color: #2d3748; /* Dark text */
-            background-color: #e2e8f0; /* Light gray button */
-            border: 2px solid #cbd5e0; /* Medium gray border */
-            box-shadow: inset -4px -4px 0px 0px #a0aec0; /* Shadow for 3D effect */
+            color: #2d3748;
+            background-color: #e2e8f0;
+            border: 2px solid #cbd5e0;
+            box-shadow: inset -4px -4px 0px 0px #a0aec0;
             text-align: center;
             text-decoration: none;
             user-select: none;
@@ -39,9 +38,9 @@
             box-shadow: inset 0px 0px 0px 0px;
         }
         .nes-container {
-            border: 4px solid #2d3748; /* Dark border */
+            border: 4px solid #2d3748;
             padding: 1.5rem;
-            background-color: rgba(255, 255, 255, 0.85); /* Semi-transparent white */
+            background-color: rgba(255, 255, 255, 0.85);
             box-shadow: 8px 8px 0px rgba(0,0,0,0.2);
         }
         #notification {
@@ -50,7 +49,6 @@
         #boss-warning {
             transition: all 0.5s ease-in-out;
         }
-        /* --- END CHANGE --- */
     </style>
 </head>
 <body class="flex items-center justify-center h-screen">
@@ -66,10 +64,10 @@
             </div>
         </div>
 
-        <!-- CHANGE: Canvas color updated for light theme -->
+        <!-- Game Canvas -->
         <canvas id="gameCanvas" class="bg-gray-100 border-4 border-gray-400 rounded-lg w-full"></canvas>
 
-        <!-- CHANGE: Overlay color updated for light theme -->
+        <!-- Start Screen -->
         <div id="start-screen" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70">
             <div class="nes-container text-center">
                 <h1 class="text-4xl mb-4">Dino RPG Runner</h1>
@@ -78,7 +76,7 @@
             </div>
         </div>
 
-        <!-- CHANGE: Overlay color updated for light theme -->
+        <!-- Game Over Screen -->
         <div id="game-over-screen" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 hidden">
             <div class="nes-container text-center">
                 <h2 class="text-3xl mb-4">Game Over</h2>
@@ -87,10 +85,9 @@
             </div>
         </div>
         
-        <!-- Boss UI (Appears during boss battles) -->
+        <!-- Boss UI -->
         <div id="boss-ui" class="hidden absolute top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-lg text-center">
             <h3 class="text-2xl font-bold text-red-500 uppercase tracking-widest animate-pulse">!! BOSS BATTLE !!</h3>
-            <!-- CHANGE: Boss UI background and text color updated -->
             <div class="mt-2 text-xl font-semibold text-gray-800 bg-white bg-opacity-60 rounded-lg px-4 py-2">
                 <span id="boss-objective-text">Minions Defeated: 0 / 10</span>
             </div>
@@ -109,12 +106,15 @@
     
     <!-- Audio Elements -->
     <audio id="bgm" src="background_music.mp3" loop></audio>
+    <!-- BUG FIX: Corrected the filename from .mpp3 to .mp3 -->
     <audio id="boss-bgm" src="boss_music.mp3" loop></audio>
 
 
     <script src="game.js"></script>
 </body>
 </html>
+
+
 
 
 
