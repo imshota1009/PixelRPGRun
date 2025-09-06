@@ -169,8 +169,16 @@ function draw() {
     // Objects
     ctx.fillStyle = '#5d4037';
     obstacles.forEach(obs => ctx.fillRect(obs.x, obs.y, obs.width, obs.height));
+    
+    // --- CHANGE: Draw coins as circles ---
     ctx.fillStyle = 'gold';
-    coinObjects.forEach(c => ctx.fillRect(c.x, c.y, c.width, c.height));
+    coinObjects.forEach(coin => {
+        ctx.beginPath();
+        ctx.arc(coin.x + coin.width / 2, coin.y + coin.height / 2, coin.width / 2, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    // --- END CHANGE ---
+
     ctx.fillStyle = 'red';
     enemies.forEach(e => ctx.fillRect(e.x, e.y, e.width, e.height));
     
@@ -220,25 +228,14 @@ function updateRunningState() {
     updateAndCheckCollisions(obstacles, (obs, i) => handlePlayerDamage());
     updateAndCheckCollisions(coinObjects, (coin, i) => { coins++; updateCoinCount(); coinObjects.splice(i, 1); });
     
-    // --- BUG FIX STARTS HERE ---
+    // --- CHANGE: Player defeats enemies by running into them ---
     updateAndCheckCollisions(enemies, (enemy, i) => {
-        // Check for stomp: player is falling and their feet are near the top of the enemy.
-        const isStomp = player.velocityY > 0 && (player.y + player.height) < (enemy.y + 20);
-
-        if (isStomp) {
-            // Defeat enemy on stomp
-            score += (10 * scoreMultiplier);
-            updateScore();
-            enemies.splice(i, 1);
-            player.velocityY = player.jumpPower * 0.5; // Small bounce
-        } else {
-            // Otherwise, it's a side collision, so player takes damage.
-            handlePlayerDamage();
-            // To prevent instant death, we remove the enemy after collision.
-            enemies.splice(i, 1);
-        }
+        score += (10 * scoreMultiplier);
+        updateScore();
+        enemies.splice(i, 1);
+        // Player no longer takes damage from regular enemies
     });
-    // --- BUG FIX ENDS HERE ---
+    // --- END CHANGE ---
     
     generateObjects();
     
@@ -419,6 +416,7 @@ function updateBoostTimer() {
         else { isBoosted = false; scoreMultiplier = 1; boostTimerEl.textContent = ''; }
     }
 }
+
 
 
 
