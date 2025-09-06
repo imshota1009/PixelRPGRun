@@ -1,0 +1,21 @@
+{
+  "name": "Dino RPG Runner",
+  "short_name": "Dino RPG",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f7fafc",
+  "theme_color": "#2d3748",
+  "description": "An endless runner game with RPG elements.",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "images/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
