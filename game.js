@@ -10,12 +10,12 @@ const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
 const finalScoreEl = document.getElementById('final-score');
 const bgm = document.getElementById('bgm');
-const bossBgm = document.getElementById('boss-bgm'); // Boss BGM element
+const bossBgm = document.getElementById('boss-bgm');
 const muteToggle = document.getElementById('mute-toggle');
 const boostTimerEl = document.getElementById('boost-timer');
 const notificationEl = document.getElementById('notification');
 const bossUi = document.getElementById('boss-ui');
-const bossHpBarFill = document.getElementById('boss-hp-bar-fill');
+const bossObjectiveText = document.getElementById('boss-objective-text'); // New element for objective
 const bossWarning = document.getElementById('boss-warning');
 
 // --- Game State and Settings ---
@@ -35,7 +35,7 @@ const player = {
 player.image.src = 'dino_player.png';
 player.image.onerror = () => { player.image = null; };
 
-// --- Merchant Data (with Shield Evolution) ---
+// --- Merchant Data ---
 const merchants = [
     { name: "Weapons Dealer", item: "Score Boost", cost: 3, action: activateScoreBoost },
     { name: "Armor Merchant", 
@@ -65,7 +65,9 @@ let nextMerchantScore = 1000;
 // Boss settings
 let boss = null;
 let nextBossScore = 10000;
-let bossProjectiles = [];
+let bossMinions = []; // Minions spawned by the boss
+let minionsDefeated = 0;
+const MINIONS_TO_DEFEAT = 10;
 
 // --- Score Boost ---
 let isBoosted = false;
@@ -98,7 +100,7 @@ function showNotification(message, duration = 3000) {
 // --- Merchant Event ---
 function triggerMerchantEvent() {
     const merchantIndex = Math.floor(Math.random() * 2);
-    if (merchantIndex === 0) { // Weapons Dealer
+    if (merchantIndex === 0) {
         const merchant = merchants[0];
         if (coins >= merchant.cost) {
             merchant.action();
@@ -107,7 +109,7 @@ function triggerMerchantEvent() {
         } else {
             showNotification(`${merchant.name} appeared, but not enough coins.`);
         }
-    } else { // Armor Merchant
+    } else {
         merchants[1].action();
         updateCoinCount();
     }
@@ -122,7 +124,7 @@ function init() {
     player.velocityY = 0; player.isJumping = false; player.shieldLevel = 0;
     isBoosted = false; scoreMultiplier = 1; boostTimerEl.textContent = '';
     obstacles = []; coinObjects = []; enemies = [];
-    boss = null; bossProjectiles = [];
+    boss = null; bossMinions = []; minionsDefeated = 0;
     bossUi.classList.add('hidden');
     frameCount = 0;
     updateScore(); updateCoinCount();
@@ -170,29 +172,28 @@ function draw() {
     ctx.fillStyle = '#5d4037';
     obstacles.forEach(obs => ctx.fillRect(obs.x, obs.y, obs.width, obs.height));
     
-    // --- CHANGE: Draw coins as circles ---
     ctx.fillStyle = 'gold';
     coinObjects.forEach(coin => {
         ctx.beginPath();
         ctx.arc(coin.x + coin.width / 2, coin.y + coin.height / 2, coin.width / 2, 0, Math.PI * 2);
         ctx.fill();
     });
-    // --- END CHANGE ---
 
     ctx.fillStyle = 'red';
     enemies.forEach(e => ctx.fillRect(e.x, e.y, e.width, e.height));
     
-    // Boss and Projectiles
-    if (gameState === 'boss' && boss) {
-        ctx.fillStyle = '#333';
-        ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
-        // Boss eyes
-        ctx.fillStyle = 'red';
-        ctx.fillRect(boss.x + 20, boss.y + 20, 15, 15);
-        ctx.fillRect(boss.x + boss.width - 35, boss.y + 20, 15, 15);
-
-        ctx.fillStyle = 'purple';
-        bossProjectiles.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
+    // Boss and Minions
+    if (gameState === 'boss') {
+        if (boss) {
+            ctx.fillStyle = '#333';
+            ctx.fillRect(boss.x, boss.y, boss.width, boss.height);
+            ctx.fillStyle = 'red';
+            ctx.fillRect(boss.x + 20, boss.y + 20, 15, 15);
+            ctx.fillRect(boss.x + boss.width - 35, boss.y + 20, 15, 15);
+        }
+        // Draw Minions
+        ctx.fillStyle = 'lime'; // Green minions
+        bossMinions.forEach(m => ctx.fillRect(m.x, m.y, m.width, m.height));
     }
 }
 
@@ -224,22 +225,16 @@ function updateRunningState() {
     updateScore();
     if (score % 200 === 0 && gameSpeed < 15) gameSpeed += 0.1;
 
-    // Object updates & collisions
     updateAndCheckCollisions(obstacles, (obs, i) => handlePlayerDamage());
     updateAndCheckCollisions(coinObjects, (coin, i) => { coins++; updateCoinCount(); coinObjects.splice(i, 1); });
-    
-    // --- CHANGE: Player defeats enemies by running into them ---
     updateAndCheckCollisions(enemies, (enemy, i) => {
         score += (10 * scoreMultiplier);
         updateScore();
         enemies.splice(i, 1);
-        // Player no longer takes damage from regular enemies
     });
-    // --- END CHANGE ---
     
     generateObjects();
     
-    // Check for events
     if (score >= nextMerchantScore) triggerMerchantEvent();
     if (score >= nextBossScore) startBossBattle();
     updateBoostTimer();
@@ -247,35 +242,39 @@ function updateRunningState() {
 
 // --- Boss State Logic ---
 function updateBossState() {
+    // Continue increasing speed during boss fight
+    score++;
+    updateScore();
+    if (score % 200 === 0 && gameSpeed < 15) gameSpeed += 0.1;
+
     // Boss movement
     boss.y += boss.vy;
     if (boss.y < 0 || boss.y + boss.height > canvas.height) boss.vy *= -1;
 
-    // Boss shooting
-    if (frameCount % 90 === 0) {
-        bossProjectiles.push({ x: boss.x, y: boss.y + boss.height / 2, width: 25, height: 15 });
+    // Boss spawns minions
+    if (frameCount % 100 === 0) {
+        bossMinions.push({ 
+            x: boss.x - 30, 
+            y: canvas.height - 30, 
+            width: 30, 
+            height: 30 
+        });
     }
     
-    // Update & check projectiles
-    for (let i = bossProjectiles.length - 1; i >= 0; i--) {
-        const p = bossProjectiles[i];
-        p.x -= gameSpeed * 1.5;
-        if (checkCollision(player, p)) {
-            handlePlayerDamage();
-            bossProjectiles.splice(i, 1);
+    // Update & check minions
+    updateAndCheckCollisions(bossMinions, (minion, i) => {
+        // Player defeats minion on touch
+        bossMinions.splice(i, 1);
+        minionsDefeated++;
+        bossObjectiveText.textContent = `Minions Defeated: ${minionsDefeated} / ${MINIONS_TO_DEFEAT}`;
+        
+        if (minionsDefeated >= MINIONS_TO_DEFEAT) {
+            endBossBattle();
         }
-        if (p.x < 0) bossProjectiles.splice(i, 1);
-    }
+    });
 
-    // Check player collision with boss
-    // Head stomp
-    if (player.velocityY > 0 && checkCollision({ ...player, y: player.y + player.height - 10, height: 10 }, { ...boss, height: 20 })) {
-        player.velocityY = player.jumpPower * 0.8; // Bounce
-        boss.hp--;
-        bossHpBarFill.style.width = `${(boss.hp / boss.maxHp) * 100}%`;
-        if (boss.hp <= 0) endBossBattle();
-    } // Body collision
-    else if (checkCollision(player, boss)) {
+    // Check player collision with boss body
+    if (checkCollision(player, boss)) {
         handlePlayerDamage();
     }
     frameCount++;
@@ -300,9 +299,12 @@ function checkCollision(rect1, rect2) {
 function startBossBattle() {
     gameState = 'boss';
     obstacles = []; enemies = []; coinObjects = []; // Clear screen
-    boss = { x: canvas.width - 150, y: 50, width: 120, height: 120, maxHp: 10, hp: 10, vy: 2 };
+    boss = { x: canvas.width - 150, y: 50, width: 120, height: 120, vy: 2 };
+    minionsDefeated = 0;
+    bossMinions = [];
+
     bossUi.classList.remove('hidden');
-    bossHpBarFill.style.width = '100%';
+    bossObjectiveText.textContent = `Minions Defeated: ${minionsDefeated} / ${MINIONS_TO_DEFEAT}`;
     
     // Switch BGM
     bgm.pause();
@@ -322,7 +324,7 @@ function startBossBattle() {
 function endBossBattle() {
     gameState = 'running';
     boss = null;
-    bossProjectiles = [];
+    bossMinions = [];
     bossUi.classList.add('hidden');
     nextBossScore += 10000;
     const reward = 50;
@@ -346,7 +348,6 @@ function startGame() {
     startScreen.classList.add('hidden');
     gameOverScreen.classList.add('hidden');
     
-    // Stop boss BGM if it was playing
     bossBgm.pause();
     bossBgm.currentTime = 0;
 
@@ -363,7 +364,7 @@ function gameOver() {
     finalScoreEl.textContent = `Final Score: ${score}, Coins: ${coins}`;
     bgm.pause();
     bgm.currentTime = 0;
-    bossBgm.pause(); // Stop boss music on game over
+    bossBgm.pause();
     bossBgm.currentTime = 0;
 }
 
@@ -397,7 +398,7 @@ restartButton.addEventListener('click', startGame);
 muteToggle.addEventListener('click', () => {
     const isMuted = !bgm.muted;
     bgm.muted = isMuted;
-    bossBgm.muted = isMuted; // Mute boss BGM as well
+    bossBgm.muted = isMuted;
     muteToggle.textContent = isMuted ? '🔇' : '🔊';
 });
 
@@ -416,9 +417,6 @@ function updateBoostTimer() {
         else { isBoosted = false; scoreMultiplier = 1; boostTimerEl.textContent = ''; }
     }
 }
-
-
-
 
 
 
