@@ -217,13 +217,28 @@ function updateRunningState() {
     if (score % 200 === 0 && gameSpeed < 15) gameSpeed += 0.1;
 
     // Object updates & collisions
-    updateAndCheckCollisions(obstacles, (obs) => handlePlayerDamage());
+    updateAndCheckCollisions(obstacles, (obs, i) => handlePlayerDamage());
     updateAndCheckCollisions(coinObjects, (coin, i) => { coins++; updateCoinCount(); coinObjects.splice(i, 1); });
+    
+    // --- BUG FIX STARTS HERE ---
     updateAndCheckCollisions(enemies, (enemy, i) => {
-        if (enemy.x < player.x + player.width + 50 && enemy.x > player.x) {
-            score += (10 * scoreMultiplier); enemies.splice(i, 1);
-        } else { handlePlayerDamage(); }
+        // Check for stomp: player is falling and their feet are near the top of the enemy.
+        const isStomp = player.velocityY > 0 && (player.y + player.height) < (enemy.y + 20);
+
+        if (isStomp) {
+            // Defeat enemy on stomp
+            score += (10 * scoreMultiplier);
+            updateScore();
+            enemies.splice(i, 1);
+            player.velocityY = player.jumpPower * 0.5; // Small bounce
+        } else {
+            // Otherwise, it's a side collision, so player takes damage.
+            handlePlayerDamage();
+            // To prevent instant death, we remove the enemy after collision.
+            enemies.splice(i, 1);
+        }
     });
+    // --- BUG FIX ENDS HERE ---
     
     generateObjects();
     
@@ -404,6 +419,8 @@ function updateBoostTimer() {
         else { isBoosted = false; scoreMultiplier = 1; boostTimerEl.textContent = ''; }
     }
 }
+
+
 
 
 
