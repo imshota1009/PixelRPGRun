@@ -142,16 +142,6 @@ function generateObjects() {
     if (frameCount % 200 === 0) enemies.push({ x: canvas.width, y: canvas.height - 30, width: 30, height: 30 });
 }
 
-// --- Player Damage (Generic Handler) ---
-function handlePlayerDamage() {
-    if (player.shieldLevel > 0) {
-        player.shieldLevel--;
-        showNotification(`Shield protected you! Level: ${player.shieldLevel}`);
-    } else {
-        gameOver();
-    }
-}
-
 // --- Drawing ---
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -168,10 +158,11 @@ function draw() {
     if (player.image) ctx.drawImage(player.image, player.x, player.y, player.width, player.height);
     else { ctx.fillStyle = 'green'; ctx.fillRect(player.x, player.y, player.width, player.height); }
 
-    // Objects
+    // Obstacles
     ctx.fillStyle = '#5d4037';
     obstacles.forEach(obs => ctx.fillRect(obs.x, obs.y, obs.width, obs.height));
     
+    // Coins
     ctx.fillStyle = 'gold';
     coinObjects.forEach(coin => {
         ctx.beginPath();
@@ -179,6 +170,7 @@ function draw() {
         ctx.fill();
     });
 
+    // Red Enemies
     ctx.fillStyle = 'red';
     enemies.forEach(e => ctx.fillRect(e.x, e.y, e.width, e.height));
     
@@ -191,6 +183,7 @@ function draw() {
             ctx.fillRect(boss.x + 20, boss.y + 20, 15, 15);
             ctx.fillRect(boss.x + boss.width - 35, boss.y + 20, 15, 15);
         }
+        // Green Minions
         ctx.fillStyle = 'lime';
         bossMinions.forEach(m => ctx.fillRect(m.x, m.y, m.width, m.height));
     }
@@ -224,18 +217,15 @@ function updateRunningState() {
     updateScore();
     if (score % 200 === 0 && gameSpeed < 15) gameSpeed += 0.1;
 
-    // --- BUG FIX STARTS HERE ---
-    // Changed the collision logic for obstacles
     updateAndCheckCollisions(obstacles, (obs, i) => {
         if (player.shieldLevel > 0) {
-            player.shieldLevel--; // Use up one shield level
-            obstacles.splice(i, 1); // IMPORTANT: Remove the obstacle that was hit
+            player.shieldLevel--;
+            obstacles.splice(i, 1);
             showNotification(`Shield protected you! Level: ${player.shieldLevel}`);
         } else {
-            gameOver(); // No shield, game over
+            gameOver();
         }
     });
-    // --- BUG FIX ENDS HERE ---
 
     updateAndCheckCollisions(coinObjects, (coin, i) => { coins++; updateCoinCount(); coinObjects.splice(i, 1); });
     updateAndCheckCollisions(enemies, (enemy, i) => {
@@ -251,7 +241,7 @@ function updateRunningState() {
     updateBoostTimer();
 }
 
-// --- Boss State Logic ---
+// --- Boss State Logic (Major Changes Here) ---
 function updateBossState() {
     score++;
     updateScore();
@@ -260,13 +250,26 @@ function updateBossState() {
     boss.y += boss.vy;
     if (boss.y < 0 || boss.y + boss.height > canvas.height) boss.vy *= -1;
 
+    // --- NEW: Boss spawns minions OR dummy obstacles ---
     if (frameCount % 100 === 0) {
-        bossMinions.push({ 
-            x: boss.x - 30, y: canvas.height - 30, 
-            width: 30, height: 30 
-        });
+        if (Math.random() < 0.25) { // 25% chance for a dummy obstacle
+            obstacles.push({
+                x: boss.x - 30,
+                y: canvas.height - 40, // On the ground
+                width: 20,
+                height: 40
+            });
+        } else { // 75% chance for a real minion
+            bossMinions.push({
+                x: boss.x - 30,
+                y: canvas.height - 30,
+                width: 30,
+                height: 30
+            });
+        }
     }
     
+    // Update and check collisions for green minions
     updateAndCheckCollisions(bossMinions, (minion, i) => {
         bossMinions.splice(i, 1);
         minionsDefeated++;
@@ -277,8 +280,25 @@ function updateBossState() {
         }
     });
 
+    // --- NEW: Update and check collisions for dummy obstacles during boss fight ---
+    updateAndCheckCollisions(obstacles, (obs, i) => {
+        if (player.shieldLevel > 0) {
+            player.shieldLevel--;
+            obstacles.splice(i, 1);
+            showNotification(`Shield protected you! Level: ${player.shieldLevel}`);
+        } else {
+            gameOver();
+        }
+    });
+
+    // Check collision with the boss's main body
     if (checkCollision(player, boss)) {
-        handlePlayerDamage();
+        if (player.shieldLevel > 0) {
+            player.shieldLevel--;
+            showNotification(`Shield protected you! Level: ${player.shieldLevel}`);
+        } else {
+            gameOver();
+        }
     }
     frameCount++;
 }
@@ -301,6 +321,7 @@ function checkCollision(rect1, rect2) {
 // --- Boss Battle Functions ---
 function startBossBattle() {
     gameState = 'boss';
+    // Clear all previous objects
     obstacles = []; enemies = []; coinObjects = [];
     boss = { x: canvas.width - 150, y: 50, width: 120, height: 120, vy: 2 };
     minionsDefeated = 0;
@@ -327,6 +348,8 @@ function endBossBattle() {
     gameState = 'running';
     boss = null;
     bossMinions = [];
+    // Clear any remaining obstacles from the boss fight
+    obstacles = []; 
     bossUi.classList.add('hidden');
     nextBossScore += 10000;
     const reward = 50;
@@ -417,7 +440,6 @@ function updateBoostTimer() {
         else { isBoosted = false; scoreMultiplier = 1; boostTimerEl.textContent = ''; }
     }
 }
-
 
 
 
