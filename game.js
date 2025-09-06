@@ -10,6 +10,7 @@ const startButton = document.getElementById('start-button');
 const restartButton = document.getElementById('restart-button');
 const finalScoreEl = document.getElementById('final-score');
 const bgm = document.getElementById('bgm');
+const bossBgm = document.getElementById('boss-bgm'); // Boss BGM element
 const muteToggle = document.getElementById('mute-toggle');
 const boostTimerEl = document.getElementById('boost-timer');
 const notificationEl = document.getElementById('notification');
@@ -291,14 +292,19 @@ function startBossBattle() {
     bossUi.classList.remove('hidden');
     bossHpBarFill.style.width = '100%';
     
+    // Switch BGM
+    bgm.pause();
+    if (!bgm.muted) {
+        bossBgm.currentTime = 0;
+        bossBgm.play().catch(e => console.log("Boss BGM failed to play."));
+    }
+
     bossWarning.classList.remove('hidden');
     bossWarning.classList.remove('opacity-0', '-translate-y-10');
     setTimeout(() => {
         bossWarning.classList.add('opacity-0', '-translate-y-10');
         setTimeout(() => bossWarning.classList.add('hidden'), 500);
     }, 2000);
-    
-    // You could change BGM here if you had another track
 }
 
 function endBossBattle() {
@@ -311,6 +317,13 @@ function endBossBattle() {
     coins += reward;
     updateCoinCount();
     showNotification(`Boss defeated! You earned ${reward} coins!`);
+    
+    // Switch BGM back
+    bossBgm.pause();
+    if (!bgm.muted) {
+        bgm.currentTime = 0;
+        bgm.play().catch(e => console.log("BGM failed to play."));
+    }
 }
 
 
@@ -320,6 +333,11 @@ function startGame() {
     gameState = 'running';
     startScreen.classList.add('hidden');
     gameOverScreen.classList.add('hidden');
+    
+    // Stop boss BGM if it was playing
+    bossBgm.pause();
+    bossBgm.currentTime = 0;
+
     if (bgm.paused) {
         bgm.play().catch(e => console.log("BGM failed to play."));
     }
@@ -333,6 +351,8 @@ function gameOver() {
     finalScoreEl.textContent = `Final Score: ${score}, Coins: ${coins}`;
     bgm.pause();
     bgm.currentTime = 0;
+    bossBgm.pause(); // Stop boss music on game over
+    bossBgm.currentTime = 0;
 }
 
 // --- Event Listeners ---
@@ -363,8 +383,10 @@ restartButton.addEventListener('click', startGame);
 
 // --- BGM Mute Function ---
 muteToggle.addEventListener('click', () => {
-    bgm.muted = !bgm.muted;
-    muteToggle.textContent = bgm.muted ? '🔇' : '🔊';
+    const isMuted = !bgm.muted;
+    bgm.muted = isMuted;
+    bossBgm.muted = isMuted; // Mute boss BGM as well
+    muteToggle.textContent = isMuted ? '🔇' : '🔊';
 });
 
 // --- Score Boost Function ---
@@ -382,7 +404,6 @@ function updateBoostTimer() {
         else { isBoosted = false; scoreMultiplier = 1; boostTimerEl.textContent = ''; }
     }
 }
-
 
 
 
