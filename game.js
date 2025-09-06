@@ -15,7 +15,7 @@ const muteToggle = document.getElementById('mute-toggle');
 const boostTimerEl = document.getElementById('boost-timer');
 const notificationEl = document.getElementById('notification');
 const bossUi = document.getElementById('boss-ui');
-const bossObjectiveText = document.getElementById('boss-objective-text'); // New element for objective
+const bossObjectiveText = document.getElementById('boss-objective-text');
 const bossWarning = document.getElementById('boss-warning');
 
 // --- Game State and Settings ---
@@ -65,7 +65,7 @@ let nextMerchantScore = 1000;
 // Boss settings
 let boss = null;
 let nextBossScore = 10000;
-let bossMinions = []; // Minions spawned by the boss
+let bossMinions = [];
 let minionsDefeated = 0;
 const MINIONS_TO_DEFEAT = 10;
 
@@ -81,7 +81,7 @@ let obstacles = [], coinObjects = [], enemies = [];
 function resizeCanvas() {
     canvas.width = gameContainer.clientWidth - 32;
     canvas.height = window.innerHeight * 0.5;
-    if (player.y === 0) { // Initial position
+    if (player.y === 0) {
       player.y = canvas.height - player.height;
     }
 }
@@ -142,7 +142,7 @@ function generateObjects() {
     if (frameCount % 200 === 0) enemies.push({ x: canvas.width, y: canvas.height - 30, width: 30, height: 30 });
 }
 
-// --- Player Damage ---
+// --- Player Damage (Generic Handler) ---
 function handlePlayerDamage() {
     if (player.shieldLevel > 0) {
         player.shieldLevel--;
@@ -191,8 +191,7 @@ function draw() {
             ctx.fillRect(boss.x + 20, boss.y + 20, 15, 15);
             ctx.fillRect(boss.x + boss.width - 35, boss.y + 20, 15, 15);
         }
-        // Draw Minions
-        ctx.fillStyle = 'lime'; // Green minions
+        ctx.fillStyle = 'lime';
         bossMinions.forEach(m => ctx.fillRect(m.x, m.y, m.width, m.height));
     }
 }
@@ -225,7 +224,19 @@ function updateRunningState() {
     updateScore();
     if (score % 200 === 0 && gameSpeed < 15) gameSpeed += 0.1;
 
-    updateAndCheckCollisions(obstacles, (obs, i) => handlePlayerDamage());
+    // --- BUG FIX STARTS HERE ---
+    // Changed the collision logic for obstacles
+    updateAndCheckCollisions(obstacles, (obs, i) => {
+        if (player.shieldLevel > 0) {
+            player.shieldLevel--; // Use up one shield level
+            obstacles.splice(i, 1); // IMPORTANT: Remove the obstacle that was hit
+            showNotification(`Shield protected you! Level: ${player.shieldLevel}`);
+        } else {
+            gameOver(); // No shield, game over
+        }
+    });
+    // --- BUG FIX ENDS HERE ---
+
     updateAndCheckCollisions(coinObjects, (coin, i) => { coins++; updateCoinCount(); coinObjects.splice(i, 1); });
     updateAndCheckCollisions(enemies, (enemy, i) => {
         score += (10 * scoreMultiplier);
@@ -242,28 +253,21 @@ function updateRunningState() {
 
 // --- Boss State Logic ---
 function updateBossState() {
-    // Continue increasing speed during boss fight
     score++;
     updateScore();
     if (score % 200 === 0 && gameSpeed < 15) gameSpeed += 0.1;
 
-    // Boss movement
     boss.y += boss.vy;
     if (boss.y < 0 || boss.y + boss.height > canvas.height) boss.vy *= -1;
 
-    // Boss spawns minions
     if (frameCount % 100 === 0) {
         bossMinions.push({ 
-            x: boss.x - 30, 
-            y: canvas.height - 30, 
-            width: 30, 
-            height: 30 
+            x: boss.x - 30, y: canvas.height - 30, 
+            width: 30, height: 30 
         });
     }
     
-    // Update & check minions
     updateAndCheckCollisions(bossMinions, (minion, i) => {
-        // Player defeats minion on touch
         bossMinions.splice(i, 1);
         minionsDefeated++;
         bossObjectiveText.textContent = `Minions Defeated: ${minionsDefeated} / ${MINIONS_TO_DEFEAT}`;
@@ -273,7 +277,6 @@ function updateBossState() {
         }
     });
 
-    // Check player collision with boss body
     if (checkCollision(player, boss)) {
         handlePlayerDamage();
     }
@@ -298,7 +301,7 @@ function checkCollision(rect1, rect2) {
 // --- Boss Battle Functions ---
 function startBossBattle() {
     gameState = 'boss';
-    obstacles = []; enemies = []; coinObjects = []; // Clear screen
+    obstacles = []; enemies = []; coinObjects = [];
     boss = { x: canvas.width - 150, y: 50, width: 120, height: 120, vy: 2 };
     minionsDefeated = 0;
     bossMinions = [];
@@ -306,7 +309,6 @@ function startBossBattle() {
     bossUi.classList.remove('hidden');
     bossObjectiveText.textContent = `Minions Defeated: ${minionsDefeated} / ${MINIONS_TO_DEFEAT}`;
     
-    // Switch BGM
     bgm.pause();
     if (!bgm.muted) {
         bossBgm.currentTime = 0;
@@ -332,14 +334,12 @@ function endBossBattle() {
     updateCoinCount();
     showNotification(`Boss defeated! You earned ${reward} coins!`);
     
-    // Switch BGM back
     bossBgm.pause();
     if (!bgm.muted) {
         bgm.currentTime = 0;
         bgm.play().catch(e => console.log("BGM failed to play."));
     }
 }
-
 
 // --- Game Start/End ---
 function startGame() {
@@ -417,6 +417,7 @@ function updateBoostTimer() {
         else { isBoosted = false; scoreMultiplier = 1; boostTimerEl.textContent = ''; }
     }
 }
+
 
 
 
