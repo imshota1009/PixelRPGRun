@@ -64,7 +64,7 @@ let nextMerchantScore = 1000;
 
 // Boss settings
 let boss = null;
-let nextBossScore = 10000;
+let nextBossScore = 1000;
 let bossMinions = []; // Minions spawned by the boss
 let minionsDefeated = 0;
 const MINIONS_TO_DEFEAT = 10;
@@ -417,6 +417,7 @@ function updateBoostTimer() {
         else { isBoosted = false; scoreMultiplier = 1; boostTimerEl.textContent = ''; }
     }
 }
+
 
 
 
