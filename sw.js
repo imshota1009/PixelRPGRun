@@ -8,8 +8,8 @@ const urlsToCache = [
   'boss_music.mp3',
   'dino_player.png',
   // 注意: アイコン画像もキャッシュリストに追加
-  'merchant_1.png',
-  'merchant_2.png'
+  'merchant1.png',
+  'merchant2.png'
 ];
 
 // インストール処理
