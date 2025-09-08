@@ -30,8 +30,8 @@ let frameCount = 0;
 
 // --- Stage Themes ---
 const stageThemes = [
-    { name: "Plains", bg: 'bg-gray-100', canvasBg: 'bg-green-100', canvasBorder: 'border-green-400', obstacle: '#5d4037' },
-    { name: "Desert", bg: 'bg-yellow-100', canvasBg: 'bg-orange-100', canvasBorder: 'border-orange-400', obstacle: '#a16207' },
+    { name: "Plains", bg: 'bg-gray-100', canvasBg: 'bg-green-100', canvasBorder: 'border-green-400', obstacle: '#5d4037', text: 'text-gray-800' },
+    { name: "Desert", bg: 'bg-yellow-100', canvasBg: 'bg-orange-100', canvasBorder: 'border-orange-400', obstacle: '#a16207', text: 'text-gray-800' },
     { name: "Night", bg: 'bg-indigo-900', canvasBg: 'bg-gray-800', canvasBorder: 'border-indigo-400', obstacle: '#a78bfa', text: 'text-white' },
     { name: "Volcano", bg: 'bg-red-900', canvasBg: 'bg-gray-900', canvasBorder: 'border-red-500', obstacle: '#450a0a', text: 'text-white' },
 ];
@@ -49,17 +49,18 @@ const merchants = [
       getItem: () => {
           if (player.shieldLevel === 0) return { item: "Shield", cost: 5 };
           if (player.shieldLevel === 1) return { item: "Shield Upgrade", cost: 10 };
-          return { item: "Shield is Max", cost: 999 };
+          return null; // Already max level
       },
       action: () => {
-          if (player.shieldLevel < 2) {
-              const details = merchants[1].getItem();
-              if(coins >= details.cost) {
-                  coins -= details.cost;
+          const itemDetails = merchants[1].getItem();
+          if (itemDetails) {
+              if (coins >= itemDetails.cost) {
+                  coins -= itemDetails.cost;
                   player.shieldLevel++;
-                  showNotification(`Purchased ${details.item}!`);
+                  updateCoinCount();
+                  showNotification(`Purchased ${itemDetails.item}!`);
               } else {
-                  showNotification(`Not enough coins for ${details.item}.`);
+                  showNotification(`Not enough coins for ${itemDetails.item}.`);
               }
           } else {
               showNotification(`Your shield is already at max level!`);
@@ -80,14 +81,13 @@ function applyStageTheme(stageIndex) {
     currentTheme = theme;
     
     // Reset body classes
-    bodyEl.className = 'flex items-center justify-center h-screen';
+    bodyEl.className = 'flex items-center justify-center h-screen transition-colors duration-500';
     // Reset canvas classes
     canvas.className = '';
     canvas.classList.add('border-4', 'rounded-lg', 'w-full', 'transition-colors', 'duration-500');
 
     // Add new classes
-    bodyEl.classList.add(theme.bg);
-    if(theme.text) bodyEl.classList.add(theme.text);
+    bodyEl.classList.add(theme.bg, theme.text);
     canvas.classList.add(theme.canvasBg, theme.canvasBorder);
 }
 
@@ -273,7 +273,7 @@ function handlePlayerDamage() {
 function resizeCanvas() {
     canvas.width = document.getElementById('game-container').clientWidth - 32;
     canvas.height = window.innerHeight * 0.5;
-    if (player.y === 0) player.y = canvas.height - player.height;
+    if (player.y === 0 || player.y > canvas.height) player.y = canvas.height - player.height;
 }
 
 function showNotification(message, duration = 3000) {
@@ -286,8 +286,19 @@ function showNotification(message, duration = 3000) {
 
 function triggerMerchantEvent() {
     const merchantIndex = Math.floor(Math.random() * 2);
-    if (merchantIndex === 0) merchants[0].action();
-    else merchants[1].action();
+    if (merchantIndex === 0) { // Weapon's Dealer
+        const merchant = merchants[0];
+        if (coins >= merchant.cost) {
+            merchant.action(); // This is activateScoreBoost
+            coins -= merchant.cost;
+            updateCoinCount();
+            showNotification(`Purchased ${merchant.item}!`);
+        } else {
+             showNotification(`${merchant.name} appeared, but not enough coins.`);
+        }
+    } else { // Armor Merchant
+        merchants[1].action();
+    }
     nextMerchantScore += 1000;
 }
 
@@ -404,7 +415,6 @@ muteToggle.addEventListener('click', () => {
     bossBgm.muted = isMuted;
     muteToggle.textContent = isMuted ? '🔇' : '🔊';
 });
-
 
 
 
