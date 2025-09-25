@@ -22,7 +22,6 @@
 `Dino RPG Runner` is an original game based on the classic dino runner, but with added RPG elements such as coin collection, auto battles, and merchant trading.  
 Jump over obstacles and see how far you can push your score!
 
-👉 Play here: [Dino RPG Runner](https://imshota1009.github.io/PixelRPGRun/)
 
 As you reach certain score milestones, unique merchants will appear randomly, allowing you to spend coins on items that help you progress further.
 
